@@ -1,0 +1,81 @@
+{% extends 'layout.twig' %}
+{% block title %}All books{% endblock %}
+{% block content %}
+
+<div class="hero">
+  <h2>Discover your next read</h2>
+  <p>{% if current_user %}Signed in as {{ current_user.username }}. Add and manage books below.
+     {% else %}Browse freely — <a href="login.php" style="color:#fff;text-decoration:underline;">log in</a> to add books.{% endif %}</p>
+</div>
+
+{% if flash %}<div class="flash">{{ flash }}</div>{% endif %}
+
+<section class="search">
+  <form method="get" action="index.php">
+    <input type="hidden" name="action" value="list">
+    <label>Title
+      <input id="title-ac" name="title" value="{{ filters.title }}" autocomplete="off" placeholder="e.g. Dune">
+      <ul id="suggestions" class="suggestions"></ul>
+    </label>
+    <label>Author
+      <input name="author" value="{{ filters.author }}" placeholder="e.g. Weir">
+    </label>
+    <label>Genre
+      <select name="genre">
+        <option value="">Any</option>
+        {% for g in genres %}
+          <option value="{{ g }}" {% if filters.genre == g %}selected{% endif %}>{{ g }}</option>
+        {% endfor %}
+      </select>
+    </label>
+    <label>Year
+      <input type="number" name="year" value="{{ filters.year }}" placeholder="2023">
+    </label>
+    <button type="submit">Search</button>
+    <a href="index.php" class="reset">Reset</a>
+  </form>
+</section>
+
+<p class="count"><strong>{{ books|length }}</strong> book(s) found</p>
+
+{% if not books %}
+  <div class="empty-state">
+    <p>📭 No books match your search.</p>
+    {% if current_user %}<a href="index.php?action=new" class="primary">Add the first book</a>{% endif %}
+  </div>
+{% else %}
+<section class="grid">
+  {% for b in books %}
+    <article class="card">
+      <img class="cover" src="{{ cover_src(b.cover) }}" alt="Cover of {{ b.title }}" loading="lazy">
+      <div class="card-body">
+        <h3 class="card-title">{{ b.title }}</h3>
+        <p class="card-author">{{ b.author }}</p>
+        <p class="card-meta">
+          <span class="tag">{{ b.genre }}</span>
+          <span class="year">{{ b.year }}</span>
+        </p>
+        {% if current_user and current_user.id == b.user_id %}
+          <div class="card-actions">
+            <a href="index.php?action=edit&id={{ b.id }}">Edit</a>
+            <form method="post" action="index.php?action=delete" onsubmit="return confirm('Delete this book?');">
+              <input type="hidden" name="csrf" value="{{ csrf() }}">
+              <input type="hidden" name="id" value="{{ b.id }}">
+              <button type="submit" class="danger">Delete</button>
+            </form>
+          </div>
+        {% else %}
+          <p class="added-by">Added by {{ b.username }}</p>
+        {% endif %}
+      </div>
+    </article>
+  {% endfor %}
+</section>
+{% endif %}
+
+{% endblock %}
+{# Final UI verification for submission #}
+
+{# final check #}
+
+{# loop #}
