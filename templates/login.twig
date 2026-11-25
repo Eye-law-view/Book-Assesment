@@ -1,0 +1,36 @@
+{% extends 'layout.twig' %}
+{% block title %}Login{% endblock %}
+{% block content %}
+
+<div class="auth-wrap">
+  <div class="auth-card">
+    <h2>Welcome back</h2>
+    <p class="auth-sub">Log in to manage the book library.</p>
+
+    {% if errors %}
+      <ul class="errors">{% for m in errors %}<li>{{ m }}</li>{% endfor %}</ul>
+    {% endif %}
+  
+    <form method="post" action="login.php" class="auth-form">
+      <input type="hidden" name="csrf" value="{{ csrf() }}">
+      <label>Username
+        <input name="username" required autofocus autocomplete="username">
+      </label>
+      <label>Password
+        <input type="password" name="password" required autocomplete="current-password">
+      </label>
+      
+      <!-- THIS IS THE NEW CAPTCHA PART -->
+      <label>Security Check: What is {{ captcha_question }}?
+        <input type="number" name="captcha" required autocomplete="off">
+      </label>
+      
+      <button type="submit" class="primary block">Log in</button>
+    </form>
+
+    <p class="auth-foot">No account yet? <a href="register.php">Sign up</a></p>
+  </div>
+</div>
+
+{% endblock %}
+{# captcha #}
